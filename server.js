@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 // Db config
-const db = require('../config/keys').mongoURI
+const db = require('./config/keys').mongoURI
 
 // Connect to mongoDB
 mongoose.connect(db, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false })
