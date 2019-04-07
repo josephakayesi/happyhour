@@ -1,5 +1,6 @@
 const Validator = require('validator')
 const isEmpty = require('./isEmpty')
+const isViable = require('./isViable')
 
 module.exports = validateRegisterInput = data => {
     let errors = {}
@@ -41,9 +42,10 @@ module.exports = validateRegisterInput = data => {
     if (Validator.isEmpty(data.confirmPassword)) {
         errors.confirmPassword = 'Confirm password field is required'
     }
-
+        
     return {
         errors,
-        isValid: isEmpty(errors)
+        // isValid: isEmpty(isViable(data.password, errors))
+        isValid: !isEmpty(errors) ? isEmpty(errors) : isEmpty(isViable(data.password, errors))
     }
 } 
