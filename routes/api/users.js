@@ -7,9 +7,12 @@ const passport = require('passport')
 
 // Load Input Validation    
 const validateRegisterInput = require('../../validation/register')
+const validateLoginInput = require('../../validation/login')
 
-// Load User model
+// Load models
 const User = require('../../models/User')
+const LoginFailureLog = require('../../models/LoginFailureLog')
+const BarAccountLog = require('../../models/BarAccountLog')
 
 // @route   GET api/users/test
 // @desc    Test users route
@@ -23,7 +26,7 @@ router.post('/register', (req, res) => {
     const { errors, isValid } = validateRegisterInput(req.body)
 
     // Check validation
-    if(!isValid){
+    if (!isValid) {
         return res.status(400).json(errors)
     }
 
@@ -64,6 +67,13 @@ router.post('/register', (req, res) => {
 // @desc    Login user / Returning JWT
 // @access  Public
 router.post('/login', (req, res) => {
+    const { errors, isValid } = validateLoginInput(req.body)
+
+    // Check validation
+    if (!isValid) {
+        return res.status(400).json(errors)
+    }
+
     const email = req.body.email
     const password = req.body.password
 
@@ -71,7 +81,8 @@ router.post('/login', (req, res) => {
         .then(user => {
             // Check for user
             if (!user) {
-                return res.status(404).json({ email: 'User not found' })
+                errors.email = 'User not found'
+                return res.status(404).json(errors)
             }
 
             // Check password
@@ -87,7 +98,37 @@ router.post('/login', (req, res) => {
                         })
                     }
                     else {
-                        return res.status(400).json({ password: 'Password incorrect' })
+
+                        const newLoginFailure = new LoginFailureLog({
+                            user: user.id,
+                            ip: req.body.ip
+                        })
+
+                        newLoginFailure.save()
+                            .then(() => {
+                                LoginFailureLog.countDocuments({ ip: req.body.ip })
+                                    .then(count => {
+                                        console.log(count)
+                                        if (count % 3 == 0) {
+                                            // Bar account for 5 minutes
+                                            console.log('bar account')
+                                            newBarAccountLog = new BarAccountLog({
+                                                user: user.id,
+                                                ip: req.body.ip
+                                            }) 
+                                            newBarAccountLog.save()
+                                            errors.accountBarred = true
+                                        }
+                                    })
+                                    .then(() => {
+                                        errors.password = 'Password incorrect'
+                                        return res.status(400).json(errors)
+                                    })
+                                    .catch(err => console.log(err))
+                            })
+                            .catch(err => console.log(err))
+
+                        
                     }
                 })
                 .catch(err => console.log(err))
@@ -101,7 +142,8 @@ router.get('/current', passport.authenticate('jwt', { session: false }), (req, r
     res.json({
         id: req.user.id,
         name: req.user.name,
-        email: req.user.email
+        email: req.user.email,
+        avatar: req.user.avatar
     })
 })
 
