@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import classnames from 'classnames'
+// import Alert from '../Alert/Alert' // Remove alert class bfore deploying
 
-const Alert = (closeAlert) => {
+const Alert = ({closeAlert}) => {
     return (
-        <div class="alert alert-dismissible alert-primary">
-            <button type="button" class="close" data-dismiss="alert" onClick={closeAlert}>&times;</button>
+        <div className="alert alert-dismissible alert-primary">
+            <button type="button" className="close" onClick={closeAlert}>&times;</button>
             <strong>Sorry!</strong> Try again in 5 minutes
         </div>
     )
@@ -22,6 +23,7 @@ class Login extends Component {
     }
 
     closeAlert = () => {
+        console.log('close alert')
         var previousErrorsState = { ...this.state.errors }
         previousErrorsState.accountBarred = false
         this.setState({ errors: { accountBarred: false } })
@@ -60,7 +62,7 @@ class Login extends Component {
                             <form>
                                 <fieldset>
                                     <legend className='display-4 pb-4'>Login</legend>
-                                    {errors.accountBarred ? <Alert closeAlert={this.closeAlert} /> : ''}
+                                    {errors.accountBarred ? <Alert closeAlert={() => this.closeAlert()} /> : ''}
                                     <div className='form-group'>
                                         <label htmlFor='email'>Email</label>
                                         <input type='email' className={classnames('form-control', { 'is-invalid': errors.email })} id='email' placeholder='Enter email' value={this.state.email} onChange={this.onInputChange} />

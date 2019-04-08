@@ -106,7 +106,7 @@ router.post('/login', (req, res) => {
 
                         newLoginFailure.save()
                             .then(() => {
-                                LoginFailureLog.countDocuments({ ip: req.body.ip })
+                                LoginFailureLog.countDocuments({ ip: req.body.ip, user: user.id })
                                     .then(count => {
                                         console.log(count)
                                         if (count % 3 == 0) {
