@@ -85,53 +85,72 @@ router.post('/login', (req, res) => {
                 return res.status(404).json(errors)
             }
 
-            // Check password
-            bcrypt.compare(password, user.password)
-                .then(isMatch => {
-                    if (isMatch) {
-                        // User matched
+            // Check if account barred
+            BarAccountLog.find({ user: user._id, ip: req.body.ip })
+                .sort({ timeTillUnbarred: -1 })
+                .limit(1)
+                .then(barred => {
+                    if (barred) {
+                        let barredDate = barred.length == 0 ? 0 : barred[0].timeTillUnbarred
 
-                        const payload = { id: user.id, name: user.name, avatar: user.avatar }
-                        // Sign token
-                        jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 }, (err, token) => {
-                            res.json({ success: true, token: `Bearer ${token}` })
-                        })
-                    }
-                    else {
+                        if (new Date(Date.now()) < barredDate){
+                            errors.barredDate = new Date(barred[0].timeTillUnbarred)
+                            errors.accountBarred = true
+                            return res.status(400).json(errors)
+                        }
+                        else {
+                            // Check password
+                            bcrypt.compare(password, user.password)
+                                .then(isMatch => {
+                                    if (isMatch) {
+                                        // User matched
 
-                        const newLoginFailure = new LoginFailureLog({
-                            user: user.id,
-                            ip: req.body.ip
-                        })
+                                        const payload = { id: user.id, name: user.name, avatar: user.avatar }
+                                        // Sign token
+                                        jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 }, (err, token) => {
+                                            res.json({ success: true, token: `Bearer ${token}` })
+                                        })
+                                    }
+                                    else {
 
-                        newLoginFailure.save()
-                            .then(() => {
-                                LoginFailureLog.countDocuments({ ip: req.body.ip, user: user.id })
-                                    .then(count => {
-                                        console.log(count)
-                                        if (count % 3 == 0) {
-                                            // Bar account for 5 minutes
-                                            console.log('bar account')
-                                            newBarAccountLog = new BarAccountLog({
-                                                user: user.id,
-                                                ip: req.body.ip
-                                            }) 
-                                            newBarAccountLog.save()
-                                            errors.accountBarred = true
-                                        }
-                                    })
-                                    .then(() => {
-                                        errors.password = 'Password incorrect'
-                                        return res.status(400).json(errors)
-                                    })
-                                    .catch(err => console.log(err))
-                            })
-                            .catch(err => console.log(err))
+                                        const newLoginFailure = new LoginFailureLog({
+                                            user: user.id,
+                                            ip: req.body.ip
+                                        })
 
-                        
+                                        newLoginFailure.save()
+                                            .then(() => {
+                                                LoginFailureLog.countDocuments({ ip: req.body.ip, user: user.id })
+                                                    .then(count => {
+                                                        console.log(count)
+                                                        if (count % 3 == 0) {
+                                                            // Bar account for 5 minutes
+                                                            newBarAccountLog = new BarAccountLog({
+                                                                user: user.id,
+                                                                ip: req.body.ip
+                                                            })
+                                                            newBarAccountLog.save()
+
+                                                            errors.accountBarred = true
+                                                            errors.barredDate = new Date(Date.now() + 300000)
+                                                        }
+                                                    })
+                                                    .then(() => {
+                                                        errors.password = 'Password incorrect'
+                                                        return res.status(400).json(errors)
+                                                    })
+                                                    .catch(err => console.log(err))
+                                            })
+                                            .catch(err => console.log(err))
+                                    }
+                                })
+                                .catch(err => console.log(err))
+                        }
                     }
                 })
                 .catch(err => console.log(err))
+
+
         })
 })
 

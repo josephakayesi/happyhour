@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import classnames from 'classnames'
 // import Alert from '../Alert/Alert' // Remove alert class bfore deploying
+import Countdown from 'react-countdown-now'
 
-const Alert = ({closeAlert}) => {
+const Alert = ({closeAlert, time}) => {
     return (
         <div className="alert alert-dismissible alert-primary">
             <button type="button" className="close" onClick={closeAlert}>&times;</button>
-            <strong>Sorry!</strong> Try again in 5 minutes
+            <strong>Sorry!</strong> Try again in <Countdown date={time}/> minutes
         </div>
     )
 }
@@ -62,7 +63,7 @@ class Login extends Component {
                             <form>
                                 <fieldset>
                                     <legend className='display-4 pb-4'>Login</legend>
-                                    {errors.accountBarred ? <Alert closeAlert={() => this.closeAlert()} /> : ''}
+                                    {errors.accountBarred ? <Alert time={errors.barredDate ? errors.barredDate : errors} closeAlert={() => this.closeAlert()} /> : ''}
                                     <div className='form-group'>
                                         <label htmlFor='email'>Email</label>
                                         <input type='email' className={classnames('form-control', { 'is-invalid': errors.email })} id='email' placeholder='Enter email' value={this.state.email} onChange={this.onInputChange} />
