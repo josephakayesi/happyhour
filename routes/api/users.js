@@ -132,7 +132,7 @@ router.post('/login', (req, res) => {
                                                             newBarAccountLog.save()
 
                                                             errors.accountBarred = true
-                                                            errors.barredDate = new Date(Date.now() + 3000)
+                                                            errors.barredDate = new Date(Date.now() + 300000)
 
                                                             let helperOptions = {
                                                                 from: '"Joseph Akayesi" <happyhourcodelnapp@gmail.com>',
