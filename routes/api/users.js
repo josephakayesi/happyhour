@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const keys = require('../../config/keys')
 const passport = require('passport')
+const { transporter } = require('../../config/nodemailer')
 
 // Load Input Validation    
 const validateRegisterInput = require('../../validation/register')
@@ -93,7 +94,7 @@ router.post('/login', (req, res) => {
                     if (barred) {
                         let barredDate = barred.length == 0 ? 0 : barred[0].timeTillUnbarred
 
-                        if (new Date(Date.now()) < barredDate){
+                        if (new Date(Date.now()) < barredDate) {
                             errors.barredDate = new Date(barred[0].timeTillUnbarred)
                             errors.accountBarred = true
                             return res.status(400).json(errors)
@@ -104,7 +105,6 @@ router.post('/login', (req, res) => {
                                 .then(isMatch => {
                                     if (isMatch) {
                                         // User matched
-
                                         const payload = { id: user.id, name: user.name, avatar: user.avatar }
                                         // Sign token
                                         jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 }, (err, token) => {
@@ -132,7 +132,19 @@ router.post('/login', (req, res) => {
                                                             newBarAccountLog.save()
 
                                                             errors.accountBarred = true
-                                                            errors.barredDate = new Date(Date.now() + 300000)
+                                                            errors.barredDate = new Date(Date.now() + 3000)
+
+                                                            let helperOptions = {
+                                                                from: '"Joseph Akayesi" <happyhourcodelnapp@gmail.com>',
+                                                                to: email,
+                                                                subject: 'Account check',
+                                                                text: `Someone is trying to access your account from ${req.body.ip}`
+                                                            }
+                                                            transporter.sendMail(helperOptions, (error, info) => {
+                                                                if (error) return console.log(error)
+                                                                console.log('Message was sent')
+                                                                console.log(info)
+                                                            })
                                                         }
                                                     })
                                                     .then(() => {
