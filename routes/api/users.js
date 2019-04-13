@@ -115,43 +115,48 @@ router.post('/login', (req, res) => {
 
                                         const newLoginFailure = new LoginFailureLog({
                                             user: user.id,
-                                            ip: req.body.ip
+                                            ip: req.body.ip,
                                         })
 
                                         newLoginFailure.save()
                                             .then(() => {
                                                 LoginFailureLog.countDocuments({ ip: req.body.ip, user: user.id })
                                                     .then(count => {
-                                                        console.log(count)
                                                         if (count % 3 == 0) {
                                                             // Bar account for 5 minutes
                                                             newBarAccountLog = new BarAccountLog({
                                                                 user: user.id,
-                                                                ip: req.body.ip
+                                                                ip: req.body.ip,
+                                                                timeTillUnbarred: new Date(Date.now() + 300000)
+
                                                             })
                                                             newBarAccountLog.save()
-
-                                                            errors.accountBarred = true
-                                                            errors.barredDate = new Date(Date.now() + 3000)
-
-                                                            let helperOptions = {
-                                                                from: '"Happy Hour" <happyhourcodelnapp@gmail.com>',
-                                                                to: email,
-                                                                subject: 'Account check',
-                                                                text: `Someone is trying to access your account from ${req.body.ip}`
-                                                            }
-                                                            transporter.sendMail(helperOptions, (error, info) => {
-                                                                if (error) return console.log(error)
-                                                                console.log('Message was sent')
-                                                                console.log(info)
-                                                            })
+                                                                .then(log => {
+                                                                        errors.barredDate = log.timeTillUnbarred,
+                                                                        errors.accountBarred = true
+                                                                        errors.password = 'Password incorrect'
+                                                                })
+                                                                .then(() => {
+                                                                    let helperOptions = {
+                                                                        from: '"Happy Hour" <happyhourcodelnapp@gmail.com>',
+                                                                        to: email,
+                                                                        subject: 'Account check',
+                                                                        text: `Someone is trying to access your account from ${req.body.ip}`
+                                                                    }
+                                                                    transporter.sendMail(helperOptions, (error, info) => {
+                                                                        if (error) console.log(error)
+                                                                    })
+                                                                })
+                                                                .then(() => {
+                                                                    return res.status(400).json(errors)
+                                                                })
+                                                                .catch(err => console.log(err))
+                                                        }
+                                                        else {
+                                                            errors.password = 'Password incorrect'
+                                                            return res.status(400).json(errors)
                                                         }
                                                     })
-                                                    .then(() => {
-                                                        errors.password = 'Password incorrect'
-                                                        return res.status(400).json(errors)
-                                                    })
-                                                    .catch(err => console.log(err))
                                             })
                                             .catch(err => console.log(err))
                                     }
@@ -161,9 +166,8 @@ router.post('/login', (req, res) => {
                     }
                 })
                 .catch(err => console.log(err))
-
-
         })
+        .catch(err => console.log(err))
 })
 
 // @route   GET api/users/current

@@ -1,29 +1,30 @@
 import axios from 'axios'
 import setAuthorizationToken from '../utils/setAuthorizationToken'
 import jwtDecode from 'jwt-decode'
-import { GET_ERRORS, SET_CURRENT_USER, IS_REGISTERED, AUTH_LOADING } from './types'
+import { GET_ERRORS, CLEAR_ERRORS, SET_CURRENT_USER, IS_REGISTERED, AUTH_LOADING } from './types'
 
 // Register user
 export const registerUser = (userData, history) => dispatch => {
-    dispatch(setAuthenticationLoading())
+    dispatch(setAuthenticationLoading(true))
     axios.post('/api/users/register', userData)
         .then(() => dispatch({
             type: IS_REGISTERED,
             payload: true
         }))
+        .then(() => dispatch(setAuthenticationLoading(false)))
         .then(() => history.push('/user'))
         .catch(err =>
             dispatch({
                 type: GET_ERRORS,
                 payload: err.response.data
             },
-                dispatch(clearAuthenticationLoading())
+                dispatch(setAuthenticationLoading(false))
             ))
 }
 
 // Login user - Get user token
 export const loginUser = userData => dispatch => {
-    dispatch(setAuthenticationLoading())
+    dispatch(setAuthenticationLoading(true))
     axios.get('http://ipinfo.io/json?token=b0e4bf5ca6e2f2')
         .then(res => userData.ip = res.data.ip)
         .then(() => {
@@ -40,14 +41,14 @@ export const loginUser = userData => dispatch => {
                     // Set current user
                     dispatch(setCurrentUser(decoded))
                 })
-                .then(() => dispatch(clearAuthenticationLoading()))
+                .then(() => dispatch(setAuthenticationLoading(false)))
                 // .then(() => history.push('/user'))
                 .catch(err => {
                     dispatch({
                         type: GET_ERRORS,
                         payload: err.response.data
                     },
-                        dispatch(clearAuthenticationLoading())
+                        dispatch(setAuthenticationLoading(false))
                     )
                 })
 
@@ -81,16 +82,16 @@ export const closeAlertRegistered = () => {
 }
 
 // Set Quotes Loading State
-export const setAuthenticationLoading = () => {
+export const setAuthenticationLoading = isAuthLoading => {
     return {
         type: AUTH_LOADING,
-        payload: true
+        payload: isAuthLoading
     }
 }
 
-export const clearAuthenticationLoading = () => {
-    return {
-        type: AUTH_LOADING,
-        payload: false
-    }
+// Clear errors from auth form
+export const clearErrors = () => dispatch => {
+    dispatch({
+        type: CLEAR_ERRORS,
+    })
 }

@@ -4,7 +4,6 @@ import classnames from 'classnames'
 class Spinner extends Component {
     render() {
         const { loading } = this.props
-        
         return (
             <div className={classnames({ 'visible mt-2': loading }, { 'invisible mt-2': !loading})}>
                 <div className='text-center'>

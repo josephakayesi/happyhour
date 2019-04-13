@@ -10,7 +10,7 @@ module.exports = validateRegisterInput = data => {
     data.password = !isEmpty(data.password) ? data.password : ''
     data.confirmPassword = !isEmpty(data.confirmPassword) ? data.confirmPassword : ''
 
-    if (!Validator.isLength(data.name, { min: 16, max: 30 })) {
+    if (!Validator.isLength(data.name, { min: 2, max: 30 })) {
         errors.name = 'Name must be between 2 and 30 characters'
     }
 
@@ -26,9 +26,8 @@ module.exports = validateRegisterInput = data => {
         errors.email = 'Email field is required'
     }
 
-    // TODO : Password length must be at least 16 characters
-    if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
-        errors.password = 'Password must be at least 6 characters'
+    if (!Validator.isLength(data.password, { min: 16, max: 30 })) {
+        errors.password = 'Password must be at least 16 characters'
     }
 
     if (Validator.isEmpty(data.password)) {

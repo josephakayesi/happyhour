@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { loginUser, closeAlertRegistered } from '../../actions/authActions'
+import { loginUser, closeAlertRegistered, clearErrors } from '../../actions/authActions'
 import classnames from 'classnames'
 import Countdown from 'react-countdown-now'
 import Spinner from '../Spinner/Spinner'
@@ -30,7 +30,7 @@ class Login extends Component {
             password: '',
             errors: {},
             isRegistered: false,
-            loading: true
+            loading: false
         }
     }
 
@@ -45,8 +45,6 @@ class Login extends Component {
     }
 
     closeAlert = () => {
-        var previousErrorsState = { ...this.state.errors }
-        previousErrorsState.accountBarred = false
         this.setState({ errors: { accountBarred: false } })
     }
 
@@ -61,9 +59,8 @@ class Login extends Component {
     onFormSubmit = (event) => {
         event.preventDefault()
 
-        this.setState({ errors: {} })
+        this.props.clearErrors()
 
-        this.setState({ errors: {} })
         const userData = {
             email: this.state.email,
             password: this.state.password,
@@ -85,7 +82,7 @@ class Login extends Component {
                             <form>
                                 <fieldset>
                                     <legend className='display-4 pb-4'>Login</legend>
-                                    {errors.accountBarred ? <Alert time={errors.barredDate ? errors.barredDate : errors} closeAlert={() => this.closeAlert()} /> : ''}
+                                    {errors.accountBarred ? <Alert time={errors.barredDate ? errors.barredDate : null} closeAlert={() => this.closeAlert()} /> : null}
                                     {isRegistered ? <AlertRegistered closeAlertRegistered={this.closeAlertRegistered} /> : ''}
                                     <div className='form-group'>
                                         <label htmlFor='email'>Email</label>
@@ -112,6 +109,7 @@ class Login extends Component {
 Login.propTypes = {
     loginUser: PropTypes.func.isRequired,
     closeAlertRegistered: PropTypes.func.isRequired,
+    clearErrors: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     errors: PropTypes.object.isRequired
 }
@@ -121,4 +119,4 @@ const mapStateToProps = state => ({
     errors: state.errors
 })
 
-export default connect(mapStateToProps, { loginUser, closeAlertRegistered })(withRouter(Login))
+export default connect(mapStateToProps, { loginUser, closeAlertRegistered, clearErrors })(withRouter(Login))

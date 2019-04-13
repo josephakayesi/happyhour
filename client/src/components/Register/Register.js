@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import { connect } from 'react-redux'
-import { registerUser } from '../../actions/authActions'
+import { registerUser, clearErrors } from '../../actions/authActions'
 import Spinner from '../Spinner/Spinner'
 
 class Register extends Component {
@@ -31,7 +31,7 @@ class Register extends Component {
     onFormSubmit = (event) => {
         event.preventDefault()
 
-        this.setState({ errors: {} })
+        this.props.clearErrors()
 
         let userData = {
             name: this.state.name,
@@ -46,7 +46,6 @@ class Register extends Component {
     render() {
         const { errors } = this.state
         const { loading } = this.props.auth
-
         return (
             <div>
                 <Spinner loading={loading} />
@@ -90,6 +89,7 @@ class Register extends Component {
 
 Register.propTypes = {
     registerUser: PropTypes.func.isRequired,
+    clearErrors: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     errors: PropTypes.object.isRequired
 }
@@ -99,4 +99,4 @@ const mapStateToProps = (state) => ({
     errors: state.errors
 })
 
-export default connect(mapStateToProps, { registerUser })(withRouter(Register))
+export default connect(mapStateToProps, { registerUser, clearErrors })(withRouter(Register))
