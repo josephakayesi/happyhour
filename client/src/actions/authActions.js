@@ -25,7 +25,7 @@ export const registerUser = (userData, history) => dispatch => {
 // Login user - Get user token
 export const loginUser = userData => dispatch => {
     dispatch(setAuthenticationLoading(true))
-    axios.get('http://ipinfo.io/json?token=b0e4bf5ca6e2f2')
+    axios.get('https://ipinfo.io/json?token=b0e4bf5ca6e2f2')
         .then(res => userData.ip = res.data.ip)
         .then(() => {
             axios.post('/api/users/login', userData)
