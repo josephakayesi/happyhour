@@ -1,7 +1,7 @@
 const app = require('express')()
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
-const passport =  require('passport')
+const passport = require('passport')
 const path = require('path')
 
 const users = require('./routes/api/users')
@@ -30,7 +30,7 @@ app.get('/', (req, res) => res.send('Hello'))
 app.use('/api/users', users)
 
 // Server stati assets if in production
-if(process.env.NODE_ENV === 'production'){
+if (process.env.NODE_ENV === 'production') {
     // Set static folder
     app.use(express.static('client/build'))
 
