@@ -132,10 +132,10 @@ router.post('/login', (req, res) => {
                                                             newBarAccountLog.save()
 
                                                             errors.accountBarred = true
-                                                            errors.barredDate = new Date(Date.now() + 300000)
+                                                            errors.barredDate = new Date(Date.now() + 3000)
 
                                                             let helperOptions = {
-                                                                from: '"Joseph Akayesi" <happyhourcodelnapp@gmail.com>',
+                                                                from: '"Happy Hour" <happyhourcodelnapp@gmail.com>',
                                                                 to: email,
                                                                 subject: 'Account check',
                                                                 text: `Someone is trying to access your account from ${req.body.ip}`

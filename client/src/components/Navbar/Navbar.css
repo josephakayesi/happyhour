@@ -9,6 +9,7 @@
 .adminDetails:not(.dropdown-toggle):hover {
     background-color: #fff;
     border-color: #fff;
+    color: #000;
     cursor: default;
 }
 

@@ -1,6 +1,5 @@
 const validator = require('validator')
 const isEmpty = require('./isEmpty')
-const magicPassword = require('../config/keys').magicPassword
 
 module.exports = validateLoginInput = data => {
     let errors = {}
