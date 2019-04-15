@@ -1,42 +1,46 @@
 module.exports = isViable = (password, errors) => {
-    // check for symbols
-    let symbols = /[ !@#$%^&*()_+\-=\];':"\\|,.<>?]{2}/g
-    if (password.match(symbols) == null) {
+    // Password requirements
+    const requirements = {
+        symbols: /[ !@#$%^&*()_+\-=\];':"\\|,.<>?]{2}/g,
+        numbers: /[0-9]{2}/g,
+        lowerCharacters: /[a-z]/g,
+        upperTwoFirstChars: /^[A-Z]{2}/,
+        isRepeated: /(.).*\1/.test(password),
+        ambiguousCharacters: /[\.\/,;:{}`~()><\[\]]/g
+    }
+
+    // Check for symbols
+    if (password.match(requirements.symbols) == null) {
         errors.password = 'Password must contain at least 2 symbols'
         return errors
     }
 
-    // check for numbers
-    let numbers = /[0-9]{2}/g
-    if (password.match(numbers) == null) {
+    // Check for numbers
+    if (password.match(requirements.numbers) == null) {
         errors.password = 'Password must contain at least 2 numbers'
         return errors
     }
 
-    // check for lower characters
-    let lowerCharacters = /[a-z]/g
-    if (password.match(lowerCharacters) == null) {
+    // Check for lower characters
+    if (password.match(requirements.lowerCharacters) == null) {
         errors.password = 'Password must contain at least one lower character'
         return errors
     }
 
-    // check uppercase for 2 first characters
-    let upperTwoFirstChars = /^[A-Z]{2}/
-    if (password.match(upperTwoFirstChars) == null) {
+    // Check first two characters for uppercase
+    if (password.match(requirements.upperTwoFirstChars) == null) {
         errors.password = 'The first two characters must be uppercase'
         return errors
     }
 
-    // check for repeated characters
-    let isRepeated = /(.).*\1/.test(password);
-    if (isRepeated) {
+    // Check for repeated characters
+    if (requirements.isRepeated) {
         errors.password = 'Password must not have repeated characters'
         return errors
     }
 
-    //check for ambiguos characters
-    let ambiguousCharacters = /[\.\/,;:{}`~()><\[\]]/g
-    if (password.match(ambiguousCharacters)) {
+    // Check for ambiguos characters
+    if (password.match(requirements.ambiguousCharacters)) {
         errors.password = 'Password must not contain ambiguous characters eg. {}[]()/\'"`~,;:.<>'
         return errors
     }

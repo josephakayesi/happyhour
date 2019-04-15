@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "test": "jest",
     "client-install": "npm install --prefix client",
     "start": "node server.js",
     "server": "nodemon server.js",
@@ -26,5 +27,8 @@
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "validator": "^10.11.0"
+  },
+  "devDependencies": {
+    "jest": "^24.7.1"
   }
 }
