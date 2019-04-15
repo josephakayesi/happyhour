@@ -44,7 +44,6 @@ module.exports = validateRegisterInput = data => {
         
     return {
         errors,
-        // isValid: isEmpty(isViable(data.password, errors))
         isValid: !isEmpty(errors) ? isEmpty(errors) : isEmpty(isViable(data.password, errors))
     }
 } 
