@@ -31,6 +31,7 @@ app.use('/api/users', users)
 // Server stati assets if in production
 if (process.env.NODE_ENV === 'production') {
     // Set static folder
+    app.use('*', express.static('client/build'))
     app.use(express.static('client/build'))
 
     app.get('*', (req, res) => {
