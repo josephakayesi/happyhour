@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const keys = require('../../config/keys')
 const passport = require('passport')
 const { transporter } = require('../../config/nodemailer')
+const template = require('../../templates/attack')
 
 // Load Input Validation    
 const validateRegisterInput = require('../../validation/register')
@@ -141,7 +142,8 @@ router.post('/login', (req, res) => {
                                                                         from: '"Happy Hour" <happyhourcodelnapp@gmail.com>',
                                                                         to: email,
                                                                         subject: 'Account check',
-                                                                        text: `Someone is trying to access your account from ${req.body.ip}`
+                                                                        text: `Someone is trying to access your account from ${req.body.ip}`,
+                                                                        html: template// html body
                                                                     }
                                                                     transporter.sendMail(helperOptions, (error, info) => {
                                                                         if (error) console.log(error)

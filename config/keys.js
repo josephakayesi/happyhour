@@ -8,7 +8,7 @@ if(process.env.NODE_ENV === 'production'){
 }
 else {
     module.exports = {
-        mongoURI: 'mongodb://localhost/happyhour',
+        mongoURI: 'mongodb://rupermurder:rupermurder2019@ds231956.mlab.com:31956/happyhour',
         secretOrKey: 'secret',
         senderEmail: 'happyhourcodelnapp@gmail.com',
         senderPassword: 'happyhour2019'
