@@ -1,13 +1,7 @@
+
 module.exports = isViable = (password, errors) => {
-    // Password requirements
-    const requirements = {
-        symbols: /[ !@#$%^&*()_+\-=\];':"\\|,.<>?]{2}/g,
-        numbers: /[0-9]{2}/g,
-        lowerCharacters: /[a-z]/g,
-        upperTwoFirstChars: /^[A-Z]{2}/,
-        isRepeated: /(.).*\1/.test(password),
-        ambiguousCharacters: /[\.\/,;:{}`~()><\[\]]/g
-    }
+    // Import passwored requirements
+    const requirements = require('./passwordRequirements')(password)
 
     // Check for symbols
     if (password.match(requirements.symbols) == null) {
